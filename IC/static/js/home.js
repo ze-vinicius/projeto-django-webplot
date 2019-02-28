@@ -24,13 +24,12 @@ $.ajaxSetup({
          }
      }
 });
+//Isso de cima são os bagulhos de crsf token do django
 
 $(document).ready(function() {
     let arquivo = $("#id_arquivo");
     let assuntos = $("#id_assuntos");
     let indices = $("#id_indices");
-
-
 
     // Quando adicionarem um arquivo, automaticamente será desabilitado
     // a opção de selecionar os assuntos ou índices
@@ -42,7 +41,31 @@ $(document).ready(function() {
 
     // Quando um assunto for selecionado serão mostrados os índices
     // Calculados daquele assunto
+    assuntos.on("click", function()
+    {
+        if(assuntos.val() === null)
+        {
+            $.ajax({
+                type: "POST",
+                url: $("form").attr("action"),
+                dataType: "json",
+                success: function(data)
+                {
+                    console.log(data);
+                    if(data.length > 0)
+                    {
+                        $.each(data, function(key, value)
+                        {
+                            assuntos.append(new Option(value[1], value[0]));
+                        })
+                    }
+                }
+            })
+        }
+    });
+
     assuntos.on("change", function() {
+        //Envia uma requisição ajax para a view puxar os indices calculados
         $.ajax({
             type: "POST",
             url: $("form").attr("action"),
@@ -54,8 +77,8 @@ $(document).ready(function() {
                 if(data.length > 0){
                     $.each(data, function(key, value)
                     {
+                        //Adiciona os options no select de indices
                         indices.append(new Option(value[1], value[0]));
-                        // console.log("key: " + value[0] + ", value: " + value[1]);
                     })
                 }
             }

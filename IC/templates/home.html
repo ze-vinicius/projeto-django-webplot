@@ -14,7 +14,7 @@
 <div class="row">
     <div class="col-sm-4"></div>
     <div class="col-sm-4">
-        <form action="{% url 'index' %}" method="POST">
+        <form action="{% url 'index' %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
                 <div class="form-group">
