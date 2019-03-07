@@ -28,5 +28,6 @@ def get_indices(id_assunto = None):
 
 class FormCalcular(forms.Form):
     arquivo = forms.FileField(required=False)
-    assuntos = forms.ChoiceField(choices=(), required=False)
-    indices = forms.ChoiceField(choices=(), required=False)
+    assuntos = forms.ChoiceField(choices=(get_assuntos()), required=False)
+    indices = forms.ChoiceField(choices=(get_indices()), required=False)
+    algoritmo = forms.ChoiceField(choices=((1, 'Média móvel local'),))

@@ -54,3 +54,5 @@ class IndiceEspDes(models.Model):
         managed = False
         db_table = 'indice_esp_des'
 
+    def make_array(self):
+        return [self.id, self.i_codigo_amc, self.valor, self.territorio_codigo]

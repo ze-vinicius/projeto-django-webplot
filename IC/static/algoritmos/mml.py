@@ -3,9 +3,7 @@ matplotlib.use('TkAgg')
 import pandas as pd
 import geopandas as gpd
 import libpysal as lps
-from django.db import connections
-import numpy as np
-
+from IC.models import *
 
 def vizinhos(x, municipios, neighbors):
     temp = municipios.loc[municipios['COD_IBGE'].isin(neighbors[x.COD_IBGE])]
@@ -14,25 +12,19 @@ def vizinhos(x, municipios, neighbors):
     return sum(temp.PESO) / len(temp)
 
 
-def dictfetchall(cursor):
-    "Return all rows from a cursor as a dict"
-    columns = [col[0] for col in cursor.description]
-    return [
-        dict(zip(columns, row))
-        for row in cursor.fetchall()
-    ]
-
-
 def calculo_assunto_indice(indice_id, assunto_id):
-    municipios = gpd.read_file('App/shapes/municipios.shp')
+    municipios = gpd.read_file('IC/static/shapes/municipios.shp')
 
-    with connections['base'].cursor() as cursor:
-        cursor.execute("SELECT * FROM indice_esp_des WHERE indice_id = %s AND assunto_id = %s", [indice_id, assunto_id])
-        assunto = cursor.fetchall()
-        df = pd.DataFrame(assunto, columns=['id', 'ano_ref', 'i_codigo_amc', 'valor', 'assunto_id', 'indice_id',
-                                            'territorio_codigo'])
+    id_esp_des = IndiceEspDes.objects.filter(indice=indice_id, assunto=assunto_id)
 
-        return media_movel_local(df, municipios)
+    resultado = []
+
+    for item in id_esp_des:
+        resultado.append(item.make_array())
+
+    df = pd.DataFrame(resultado, columns=['id', 'i_codigo_amc', 'valor', 'territorio_codigo'])
+
+    return media_movel_local(df, municipios)
 
 
 def media_movel_local(dataframe, municipios):
@@ -60,12 +52,13 @@ def media_movel_local(dataframe, municipios):
     neighbors = lps.weights.Rook.from_dataframe(municipios, idVariable='COD_IBGE').neighbors
     municipios.loc[:, 'MEDIA_MOVEL'] = municipios.apply(lambda x: vizinhos(x, municipios, neighbors), axis=1)
 
-    municipios[['COD_IBGE', 'PESO', 'MEDIA_MOVEL']].to_json("static/resultado.json", orient='records')
+    municipios[['COD_IBGE', 'PESO', 'MEDIA_MOVEL']].to_csv("IC/static/resultados/resultado.csv")
 
+    return municipios[['COD_IBGE', 'PESO', 'MEDIA_MOVEL']].to_html()
 
 def calculo_csv_usuario(path, delimiter=','):
     if path:
-        municipios = gpd.read_file('App/shapes/municipios.shp')
+        municipios = gpd.read_file('IC/static/shapes/municipios.shp')
 
         # utilizando um shape de 2010.
         dataframe = pd.read_csv(path, delimiter=delimiter)

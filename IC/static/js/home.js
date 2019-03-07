@@ -31,11 +31,25 @@ $(document).ready(function() {
     let assuntos = $("#id_assuntos");
     let indices = $("#id_indices");
 
+    assuntos.empty();
+    indices.empty();
+
+
     // Quando adicionarem um arquivo, automaticamente será desabilitado
     // a opção de selecionar os assuntos ou índices
     arquivo.on("change", function() {
-        assuntos.attr("disabled", "disabled");
-        indices.attr("disabled", "disabled");
+        if(this.files[0].type === "text/csv")
+        {
+            assuntos.attr("disabled", "disabled");
+            indices.attr("disabled", "disabled");
+            $("#erro-arquivo").remove();
+        } else
+        {
+            $("#erro-arquivo").append("Adicione um arquivo csv");
+            $(this).val("");
+        }
+
+
     });
 
 
@@ -59,17 +73,19 @@ $(document).ready(function() {
                             assuntos.append(new Option(value[1], value[0]));
                         })
                     }
+                    get_indices(assuntos.val());
+                    arquivo.attr("disabled", "disabled");
                 }
             })
         }
     });
 
-    assuntos.on("change", function() {
-        //Envia uma requisição ajax para a view puxar os indices calculados
+    function get_indices(assunto_id)
+    {
         $.ajax({
             type: "POST",
             url: $("form").attr("action"),
-            data: {"id_assunto" : assuntos.val()},
+            data: {"id_assunto" : assunto_id},
             dataType: "json",
             success: function(data) {
                 indices.empty();
@@ -83,6 +99,11 @@ $(document).ready(function() {
                 }
             }
         })
+    }
+
+    assuntos.on("change", function() {
+        //Envia uma requisição ajax para a view puxar os indices calculados
+        get_indices(assuntos.val());
     });
 
     indices.on("click", function() {
@@ -90,4 +111,12 @@ $(document).ready(function() {
 
         });
     });
+
+    function verificaArquivo(arq)
+    {
+        if(arq.files)
+        {
+            console.log(arq.files.type);
+        }
+    }
 });
