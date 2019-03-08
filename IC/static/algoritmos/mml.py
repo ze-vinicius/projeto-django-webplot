@@ -51,10 +51,16 @@ def media_movel_local(dataframe, municipios):
     # CRIA A MATRIZ DE VIZINHAÇA
     neighbors = lps.weights.Rook.from_dataframe(municipios, idVariable='COD_IBGE').neighbors
     municipios.loc[:, 'MEDIA_MOVEL'] = municipios.apply(lambda x: vizinhos(x, municipios, neighbors), axis=1)
+    municipios.rename(columns={"COD_IBGE" : "id"}, inplace=True)
 
-    municipios[['COD_IBGE', 'PESO', 'MEDIA_MOVEL']].to_csv("IC/static/resultados/resultado.csv")
+    peso = municipios.rename(columns={"PESO": "value"})
+    peso[["id", "value"]].to_json("IC/static/resultados/peso.json", orient="records")
 
-    return municipios[['COD_IBGE', 'PESO', 'MEDIA_MOVEL']].to_html()
+    media_movel = municipios.rename(columns={"MEDIA_MOVEL": "value"})
+    media_movel[["id", "value"]].to_json("IC/static/resultados/media_movel.json", orient="records")
+
+    municipios[['id', 'PESO', 'MEDIA_MOVEL']].to_csv("IC/static/resultados/resultado.csv")
+    return municipios[["id", 'PESO', 'MEDIA_MOVEL']].to_html()
 
 def calculo_csv_usuario(path, delimiter=','):
     if path:

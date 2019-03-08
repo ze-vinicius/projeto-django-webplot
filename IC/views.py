@@ -32,3 +32,7 @@ def index(request):
         form = FormCalcular()
 
     return render(request, 'home.html', {'form': form})
+
+
+def testes(request):
+    return render(request, 'resultado.html')
