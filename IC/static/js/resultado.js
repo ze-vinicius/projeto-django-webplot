@@ -57,8 +57,8 @@ polygonTemplate.propertyFields.fill = "fill";
 polygonSeries.heatRules.push({
 "property": "fill",
 "target": polygonSeries.mapPolygons.template,
-"min": am4core.color("#F5DBCB"),
-"max": am4core.color("#ED7B84"),
+"min": am4core.color("#f56647"),
+"max": am4core.color("#ed0a0b"),
 // "dataField" : "PESO"
 });
 
