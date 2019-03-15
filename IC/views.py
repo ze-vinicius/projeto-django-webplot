@@ -7,8 +7,8 @@ from .static.algoritmos.mml import *
 
 
 def index(request):
-    if request.is_ajax() and request.method == "POST":
-        if "id_assunto" in request.POST:
+    if request.is_ajax() and request.method == 'POST':
+        if 'id_assunto' in request.POST:
             indices = get_indices(request.POST['id_assunto'])
             indices = json.dumps(indices)
             return HttpResponse(indices, content_type='application/json')
@@ -25,9 +25,11 @@ def index(request):
             dados = form.cleaned_data
 
             if dados['arquivo']:
-                return HttpResponse(calculo_csv_usuario(dados['arquivo']))
+                calculo_csv_usuario(dados['arquivo'])
+                return render(request, 'resultado.html')
             elif dados['assuntos'] and dados['indices']:
-                return HttpResponse(calculo_assunto_indice(dados['indices'], dados['assuntos']))
+                calculo_assunto_indice(dados['indices'], dados['assuntos'])
+                return render(request, 'resultado.html')
     else:
         form = FormCalcular()
 
