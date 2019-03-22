@@ -54,13 +54,13 @@ def media_movel_local(dataframe, municipios):
     municipios.rename(columns={"COD_IBGE" : "id"}, inplace=True)
 
     peso = municipios.rename(columns={"PESO": "value"})
-    peso[["id", "value"]].to_json("IC/static/resultados/peso.json", orient="records")
+    # peso = peso[["id", "value"]].to_json("IC/static/resultados/peso.json", orient="records")
 
     media_movel = municipios.rename(columns={"MEDIA_MOVEL": "value"})
-    media_movel[["id", "value"]].to_json("IC/static/resultados/media_movel.json", orient="records")
+    # return media_movel[["id", "value"]].to_json("IC/static/resultados/media_movel.json", orient="records")
 
-    municipios[['id', 'PESO', 'MEDIA_MOVEL']].to_csv("IC/static/resultados/resultado.csv")
-    return municipios[["id", 'PESO', 'MEDIA_MOVEL']].to_html()
+    return peso[["id", "value"]].to_json(orient="records"), media_movel[["id", "value"]].to_json(orient="records")
+
 
 def calculo_csv_usuario(path, delimiter=','):
     if path:

@@ -8,7 +8,21 @@ from .static.algoritmos.mml import *
 
 def index(request):
     if request.is_ajax() and request.method == 'POST':
-        if 'id_assunto' in request.POST:
+
+        if 'submit' in request.POST:
+            form = FormCalcular(request.POST, request.FILES)
+
+            if form.is_valid():
+                dados = form.cleaned_data
+                if dados['arquivo']:
+                    resultado = json.dumps(calculo_csv_usuario(dados['arquivo']))
+                    return HttpResponse(resultado, content_type='application/json')
+
+                elif dados['assuntos'] and dados['indices']:
+                    peso, media_movel = calculo_assunto_indice(dados['indices'], dados['assuntos'])
+                    return HttpResponse(json.dumps({"peso" : peso, "media_movel" : media_movel}), content_type='application/json')
+
+        elif 'id_assunto' in request.POST:
             indices = get_indices(request.POST['id_assunto'])
             indices = json.dumps(indices)
             return HttpResponse(indices, content_type='application/json')
@@ -16,20 +30,10 @@ def index(request):
             assuntos = get_assuntos()
             assuntos = json.dumps(assuntos)
             return HttpResponse(assuntos, content_type='applications/json')
-    elif request.method == 'POST':
-        algoritmos = [calculo_csv_usuario, calculo_assunto_indice]
 
-        form = FormCalcular(request.POST, request.FILES)
+    # elif request.method == 'POST':
+    #     algoritmos = [calculo_csv_usuario, calculo_assunto_indice]
 
-        if form.is_valid():
-            dados = form.cleaned_data
-
-            if dados['arquivo']:
-                calculo_csv_usuario(dados['arquivo'])
-                return render(request, 'resultado.html')
-            elif dados['assuntos'] and dados['indices']:
-                calculo_assunto_indice(dados['indices'], dados['assuntos'])
-                return render(request, 'resultado.html')
     else:
         form = FormCalcular()
 
